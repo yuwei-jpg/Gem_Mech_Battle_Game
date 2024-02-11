@@ -6,7 +6,7 @@ import button
 pygame.init()
 
 # game window
-SCREEN_WIDTH = 640
+SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 384
 MARGIN_LEFT = 300
 WIDTH = SCREEN_WIDTH + MARGIN_LEFT
