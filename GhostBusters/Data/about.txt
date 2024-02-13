@@ -1,1 +1,3 @@
-CS3306_pyGame
+———————— CS3305_Group13_pyGame ————————
+GhostBusters is an adventure and a level-breaking game.
+Your ultimate goal is to get all the gems when you pass the level, avoid enemy attacks and successfully reach the end of the game.

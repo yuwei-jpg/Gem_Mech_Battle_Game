@@ -1,6 +1,7 @@
 import pygame
 
-from GhostBusters.level import Level_Background
+from GhostBusters import world
+from GhostBusters.level import Level_Background, screen
 from world import World, load_level
 from player import Player
 from enemies import Ghost
@@ -29,21 +30,25 @@ MOON = pygame.transform.scale(pygame.image.load('assets/moon.png'), (300, 220))
 
 title_font = "Fonts/Aladin-Regular.ttf"
 instructions_font = 'Fonts/BubblegumSans-Regular.ttf'
-
+about_intro_font = 'Fonts/DalelandsUncialBold-82zA.ttf'
+about_intro_font2 = 'Fonts/times new roman bold.ttf'
 ghostbusters = Message(WIDTH // 2 + 50, HEIGHT // 2 - 90, 90, "Ghost Busters", title_font, (255, 255, 255), win)
-left_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 90, 20, "Press left arrow key to go left", instructions_font,
+left_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 125, 20, "Press left arrow key to go left", instructions_font,
                    (255, 255, 255), win)
-right_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 65, 20, "Press right arrow key to go right", instructions_font,
+right_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 100, 20, "Press right arrow key to go right", instructions_font,
                     (255, 255, 255), win)
-up_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 45, 20, "Press up arrow key to jump", instructions_font,
+up_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 75, 20, "Press up arrow key to jump", instructions_font,
                  (255, 255, 255), win)
-space_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 25, 20, "Press space key to shoot", instructions_font,
+space_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 50, 20, "Press space key to shoot", instructions_font,
                     (255, 255, 255), win)
-g_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 5, 20, "Press g key to throw grenade", instructions_font,
+g_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 25, 20, "Press g key to throw grenade", instructions_font,
+                (255, 255, 255), win)
+w_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 0, 20, "Press w key to fly", instructions_font,
                 (255, 255, 255), win)
 game_won_msg = Message(WIDTH // 2 + 10, HEIGHT // 2 - 5, 20, "You have won the game", instructions_font,
                        (255, 255, 255), win)
-
+# intro_msg=Message(WIDTH // 2 + 10, HEIGHT // 2 - 5, 20, "CS3305_Group13_pyGame Introduction", about_intro_font2,
+#                        (0, 0, 0), win)
 t = Text(instructions_font, 18)
 font_color = (12, 12, 12)
 play = t.render('Play', font_color)
@@ -54,6 +59,8 @@ exit = t.render('Exit', font_color)
 main_menu = t.render('Main Menu', font_color)
 
 about_font = pygame.font.SysFont('Times New Roman', 20)
+counter_font = pygame.font.Font(None, 25)  # 创建字体对象，None为使用默认字体，36为字体大小
+
 with open('Data/about.txt') as f:
     info = f.read().replace('\n', ' ')
 
@@ -103,7 +110,10 @@ p_image = pygame.transform.scale(pygame.image.load('Assets/Player/PlayerIdle1.pn
 p_rect = p_image.get_rect(center=(470, 200))
 p_dy = 1
 p_ctr = 1
-
+# CALCULATE THE COLLECTED_DIAMONDS *********************************************
+# world1=World(objects_group)
+collected_diamonds = 0
+total_diamonds = 0
 # LEVEL VARIABLES **************************************************************
 
 ROWS = 24
@@ -264,6 +274,7 @@ while running:
 
     elif about_page:
         MessageBox(win, about_font, 'GhostBusters', info)
+        # intro_msg.update()
         if main_menu_btn.draw(win):
             menu_click_fx.play()
             about_page = False
@@ -316,6 +327,7 @@ while running:
         up_key.update()
         space_key.update()
         g_key.update()
+        w_key.update()
 
         if main_menu_btn.draw(win):
             menu_click_fx.play()
@@ -337,7 +349,10 @@ while running:
     elif game_start:
         win.blit(MOON, (-40, -10))
         w.draw_world(win, screen_scroll)
-
+        # print(world1.get_total_diamonds())
+        diamonds_text = counter_font.render(f"Diamonds: {collected_diamonds}/{w.get_total_diamonds()}", True,
+                                            (255, 255, 255))
+        screen.blit(diamonds_text, (WIDTH - diamonds_text.get_width() - 10, 10))  # 在屏幕右上角绘制
         # Updating Objects ********************************************************
 
         bullet_group.update(screen_scroll, w)
@@ -385,11 +400,18 @@ while running:
 
         if pygame.sprite.spritecollide(p, diamond_group, True):
             diamond_fx.play()
+            collected_diamonds += 1
             pass
 
         if pygame.sprite.spritecollide(p, exit_group, False):
-            next_level_fx.play()
-            level += 1
+            if collected_diamonds == w.get_total_diamonds() or collected_diamonds > w.get_total_diamonds():
+                total_diamonds += collected_diamonds
+                collected_diamonds = 0
+                next_level_fx.play()
+                level += 1
+
+            else:
+                print("You haven't collected enough diamonds!")
             if level <= MAX_LEVEL:
                 health = p.health
 
@@ -401,6 +423,7 @@ while running:
                 screen_scroll = 0
                 bg_scroll = 0
             else:
+                
                 game_won = True
 
         potion = pygame.sprite.spritecollide(p, potion_group, False)
@@ -428,7 +451,6 @@ while running:
                     bullet.kill()
 
         # drawing variables *******************************************************
-
         if p.alive:
             color = (0, 255, 0)
             if p.health <= 40:
