@@ -119,7 +119,7 @@ total_diamonds = 0
 ROWS = 24
 COLS = 40
 SCROLL_THRES = 200
-MAX_LEVEL = 10
+MAX_LEVEL = 1
 
 level = 1
 level_length = 0
@@ -170,6 +170,13 @@ game_start = False
 game_start2 = False
 game_won = True
 running = True
+
+# 游戏胜利消息的透明度
+alpha = 0
+# 游戏胜利消息显示时间（毫秒）
+message_display_time = 5000  # 5秒
+start_display_time = None  # 开始显示消息的时间
+
 while running:
     win.fill((0, 0, 0))
     for x in range(5):
@@ -177,7 +184,7 @@ while running:
         win.blit(BG2, ((x * WIDTH) - bg_scroll * 0.7, 0))
         win.blit(BG3, ((x * WIDTH) - bg_scroll * 0.8, 0))
 
-    if not game_start:
+    if not game_start or level_page:
         win.blit(MOON, (-40, 150))
 
     for event in pygame.event.get():
@@ -318,7 +325,7 @@ while running:
             level_page = False
             main_menu = False
             game_won = False
-            game_start2 = True  # 开始游戏
+            game_start = True  # 开始游戏
             world_data, level_length, w = reset_level(4)
             p, moving_left, moving_right = reset_player()
 
@@ -340,12 +347,54 @@ while running:
         pass
 
     elif game_won:
-        game_won_msg.update()
-        if main_menu_btn.draw(win):
-            menu_click_fx.play()
-            controls_page = False
-            main_menu = True
-            level = 1
+        game_start = False
+        if start_display_time is None:
+            start_display_time = pygame.time.get_ticks()
+        message = (f"You have got {total_diamonds} gems, you can take these gems with you! Thank you for playing the "
+                   f"GHOST BUSTERS")
+
+        # 计算消息透明度
+        time_passed = pygame.time.get_ticks() - start_display_time
+        alpha = min(255, time_passed // 20)  # 逐渐增加透明度，直到255
+
+        win.fill((0, 0, 0))  # 用黑色填充屏幕
+        # 渲染游戏胜利的消息
+        font = pygame.font.Font(None, 40)
+        lines = message.split(" ")  # 先按空格分割
+        wrapped_lines = []
+        line = ""
+        for word in lines:
+            test_line = f"{line} {word}".strip()
+            # 测试这行文本加上新词后的宽度
+            width, height = font.size(test_line)
+            if width <= WIDTH - 20:  # 20为边缘留白
+                line = test_line
+            else:
+                wrapped_lines.append(line)  # 保存当前行，开始新的一行
+                line = word
+        wrapped_lines.append(line)  # 添加最后一行
+        line_spaceing = 10
+        total_height = len(wrapped_lines) * height
+        start_y = (HEIGHT - total_height) // 2
+        for i, line in enumerate(wrapped_lines):
+            text_surface = font.render(line, True, (255, 255, 255))
+            text_surface.set_alpha(alpha)  # 设置文本透明度
+            text_rect = text_surface.get_rect(center=(WIDTH // 2, start_y + i * (height + line_spaceing)))
+            win.blit(text_surface, text_rect)
+
+        # 当消息完全显示一段时间后，自动返回主菜单
+        if time_passed > message_display_time + 2000:  # 给消息完全显示后再等2秒
+            # win.blit(MOON, (-40, -10))
+            # game_won = False
+            # main_menu = True
+
+            # game_won_msg.update()
+            if main_menu_btn.draw(win):
+                # win.blit(MOON, (-40, 150))
+                menu_click_fx.play()
+                controls_page = False
+                main_menu = True
+                level = 1
 
 
     elif game_start:
@@ -477,134 +526,136 @@ while running:
             controls_page = False
             game_start = False
 
-    elif game_start2:
-        win.blit(MOON, (-40, -10))
-        w.draw_world(win, screen_scroll)
-        # print(world1.get_total_diamonds())
-        diamonds_text = counter_font.render(f"Diamonds: {collected_diamonds}/{w.get_total_diamonds()}", True,
-                                            (255, 255, 255))
-        screen.blit(diamonds_text, (WIDTH - diamonds_text.get_width() - 10, 10))  # 在屏幕右上角绘制
-        # Updating Objects ********************************************************
+    # elif game_start2:
+    #     win.blit(MOON, (-40, -10))
+    #     w.draw_world(win, screen_scroll)
+    #     # print(world1.get_total_diamonds())
+    #     diamonds_text = counter_font.render(f"Diamonds: {collected_diamonds}/{w.get_total_diamonds()}", True,
+    #                                         (255, 255, 255))
+    #     screen.blit(diamonds_text, (WIDTH - diamonds_text.get_width() - 10, 10))  # 在屏幕右上角绘制
+    #     # Updating Objects ********************************************************
+    #
+    #     bullet_group.update(screen_scroll, w)
+    #     grenade_group.update(screen_scroll, p, enemy_group, explosion_group, w)
+    #     explosion_group.update(screen_scroll)
+    #     trail_group.update()
+    #     water_group.update(screen_scroll)
+    #     water_group.draw(win)
+    #     diamond_group.update(screen_scroll)
+    #     diamond_group.draw(win)
+    #     potion_group.update(screen_scroll)
+    #     potion_group.draw(win)
+    #     exit_group.update(screen_scroll)
+    #     exit_group.draw(win)
+    #
+    #     enemy_group.update(screen_scroll, bullet_group, p)
+    #     enemy_group.draw(win)
+    #
+    #     if p.jump:
+    #         t = Trail(p.rect.center, (220, 220, 220), win)
+    #         trail_group.add(t)
+    #     if p.jump2:
+    #         t2 = Trail(p.rect.center, (220, 220, 220), win)
+    #         trail_group.add(t2)
+    #
+    #     screen_scroll = 0
+    #     p.update(moving_left, moving_right, w)
+    #     p.draw(win)
+    #
+    #     if (p.rect.right >= WIDTH - SCROLL_THRES and bg_scroll < (level_length * TILE_SIZE) - WIDTH) \
+    #             or (p.rect.left <= SCROLL_THRES and bg_scroll > abs(dx)):
+    #         dx = p.dx
+    #         p.rect.x -= dx
+    #         screen_scroll = -dx
+    #         bg_scroll -= screen_scroll
+    #
+    #     # Collision Detetction ****************************************************
+    #
+    #     if p.rect.bottom > HEIGHT:
+    #         p.health = 0
+    #
+    #     if pygame.sprite.spritecollide(p, water_group, False):
+    #         p.health = 0
+    #         level = 1
+    #
+    #     if pygame.sprite.spritecollide(p, diamond_group, True):
+    #         diamond_fx.play()
+    #         collected_diamonds += 1
+    #         pass
+    #
+    #     if pygame.sprite.spritecollide(p, exit_group, False):
+    #         if collected_diamonds == w.get_total_diamonds() or collected_diamonds > w.get_total_diamonds():
+    #             total_diamonds += collected_diamonds
+    #             collected_diamonds = 0
+    #             next_level_fx.play()
+    #             level += 1
+    #
+    #         else:
+    #             print("You haven't collected enough diamonds!")
+    #
+    #         if level <= MAX_LEVEL:
+    #             health = p.health
+    #
+    #             world_data, level_length, w = reset_level(level)
+    #             p, moving_left, moving_right = reset_player()
+    #
+    #             p.health = health
+    #
+    #             screen_scroll = 0
+    #             bg_scroll = 0
+    #         else:
+    #
+    #             game_won = True
+    #
+    #     potion = pygame.sprite.spritecollide(p, potion_group, False)
+    #     if potion:
+    #         if p.health < 100:
+    #             potion[0].kill()
+    #             p.health += 15
+    #             health_fx.play()
+    #             if p.health > 100:
+    #                 p.health = 100
+    #
+    #     for bullet in bullet_group:
+    #         enemy = pygame.sprite.spritecollide(bullet, enemy_group, False)
+    #         if enemy and bullet.type == 1:
+    #             if not enemy[0].hit:
+    #                 enemy[0].hit = True
+    #                 enemy[0].health -= 50
+    #             bullet.kill()
+    #         if bullet.rect.colliderect(p):
+    #             if bullet.type == 2:
+    #                 if not p.hit:
+    #                     p.hit = True
+    #                     p.health -= 20
+    #                     print(p.health)
+    #                 bullet.kill()
+    #
+    #     # drawing variables *******************************************************
+    #     if p.alive:
+    #         color = (0, 255, 0)
+    #         if p.health <= 40:
+    #             color = (255, 0, 0)
+    #         pygame.draw.rect(win, color, (6, 8, p.health, 20), border_radius=10)
+    #     pygame.draw.rect(win, (255, 255, 255), (6, 8, 100, 20), 2, border_radius=10)
+    #
+    #     for i in range(p.grenades):
+    #         pygame.draw.circle(win, (200, 200, 200), (20 + 15 * i, 40), 5)
+    #         pygame.draw.circle(win, (255, 50, 50), (20 + 15 * i, 40), 4)
+    #         pygame.draw.circle(win, (0, 0, 0), (20 + 15 * i, 40), 1)
+    #
+    #     if p.health <= 0:
+    #         world_data, level_length, w = reset_level(level)
+    #         p, moving_left, moving_right = reset_player()
+    #
+    #         screen_scroll = 0
+    #         bg_scroll = 0
+    #
+    #         main_menu = True
+    #         about_page = False
+    #         controls_page = False
+    #         game_start2 = False
 
-        bullet_group.update(screen_scroll, w)
-        grenade_group.update(screen_scroll, p, enemy_group, explosion_group, w)
-        explosion_group.update(screen_scroll)
-        trail_group.update()
-        water_group.update(screen_scroll)
-        water_group.draw(win)
-        diamond_group.update(screen_scroll)
-        diamond_group.draw(win)
-        potion_group.update(screen_scroll)
-        potion_group.draw(win)
-        exit_group.update(screen_scroll)
-        exit_group.draw(win)
-
-        enemy_group.update(screen_scroll, bullet_group, p)
-        enemy_group.draw(win)
-
-        if p.jump:
-            t = Trail(p.rect.center, (220, 220, 220), win)
-            trail_group.add(t)
-        if p.jump2:
-            t2 = Trail(p.rect.center, (220, 220, 220), win)
-            trail_group.add(t2)
-
-        screen_scroll = -2
-        p.update(moving_left, moving_right, w)
-        p.draw(win)
-
-        if (p.rect.right >= WIDTH - SCROLL_THRES and bg_scroll < (level_length * TILE_SIZE) - WIDTH) \
-                or (p.rect.left <= SCROLL_THRES and bg_scroll > abs(dx)):
-            dx = p.dx
-            p.rect.x -= dx
-            screen_scroll = -dx
-            bg_scroll -= screen_scroll
-
-        # Collision Detetction ****************************************************
-
-        if p.rect.bottom > HEIGHT:
-            p.health = 0
-
-        if pygame.sprite.spritecollide(p, water_group, False):
-            p.health = 0
-            level = 1
-
-        if pygame.sprite.spritecollide(p, diamond_group, True):
-            diamond_fx.play()
-            collected_diamonds += 1
-            pass
-
-        if pygame.sprite.spritecollide(p, exit_group, False):
-            if collected_diamonds == w.get_total_diamonds() or collected_diamonds > w.get_total_diamonds():
-                total_diamonds += collected_diamonds
-                collected_diamonds = 0
-                next_level_fx.play()
-                level += 1
-
-            else:
-                print("You haven't collected enough diamonds!")
-            if level <= MAX_LEVEL:
-                health = p.health
-
-                world_data, level_length, w = reset_level(level)
-                p, moving_left, moving_right = reset_player()
-
-                p.health = health
-
-                screen_scroll = 0
-                bg_scroll = 0
-            else:
-
-                game_won = True
-
-        potion = pygame.sprite.spritecollide(p, potion_group, False)
-        if potion:
-            if p.health < 100:
-                potion[0].kill()
-                p.health += 15
-                health_fx.play()
-                if p.health > 100:
-                    p.health = 100
-
-        for bullet in bullet_group:
-            enemy = pygame.sprite.spritecollide(bullet, enemy_group, False)
-            if enemy and bullet.type == 1:
-                if not enemy[0].hit:
-                    enemy[0].hit = True
-                    enemy[0].health -= 50
-                bullet.kill()
-            if bullet.rect.colliderect(p):
-                if bullet.type == 2:
-                    if not p.hit:
-                        p.hit = True
-                        p.health -= 20
-                        print(p.health)
-                    bullet.kill()
-
-        # drawing variables *******************************************************
-        if p.alive:
-            color = (0, 255, 0)
-            if p.health <= 40:
-                color = (255, 0, 0)
-            pygame.draw.rect(win, color, (6, 8, p.health, 20), border_radius=10)
-        pygame.draw.rect(win, (255, 255, 255), (6, 8, 100, 20), 2, border_radius=10)
-
-        for i in range(p.grenades):
-            pygame.draw.circle(win, (200, 200, 200), (20 + 15 * i, 40), 5)
-            pygame.draw.circle(win, (255, 50, 50), (20 + 15 * i, 40), 4)
-            pygame.draw.circle(win, (0, 0, 0), (20 + 15 * i, 40), 1)
-
-        if p.health <= 0:
-            world_data, level_length, w = reset_level(level)
-            p, moving_left, moving_right = reset_player()
-
-            screen_scroll = 0
-            bg_scroll = 0
-
-            main_menu = True
-            about_page = False
-            controls_page = False
-            game_start2 = False
     pygame.draw.rect(win, (255, 255, 255), (0, 0, WIDTH, HEIGHT), 4, border_radius=10)
     clock.tick(FPS)
     pygame.display.update()

@@ -22,6 +22,11 @@ GREEN = (0, 255, 0)
 
 # 关卡区域（示例）
 levels = [pygame.Rect(100, 100, 100, 50), pygame.Rect(300, 100, 100, 50)]
+BG1 = pygame.transform.scale(pygame.image.load('assets/BG1.png'), (WIDTH, HEIGHT))
+BG2 = pygame.transform.scale(pygame.image.load('assets/BG2.png'), (WIDTH, HEIGHT))
+BG3 = pygame.transform.scale(pygame.image.load('assets/BG3.png'), (WIDTH, HEIGHT))
+MOON = pygame.transform.scale(pygame.image.load('assets/moon.png'), (300, 220))
+
 
 # 设置声音
 diamond_fx = pygame.mixer.Sound('Sounds/point.mp3')
@@ -39,9 +44,9 @@ main_menu = t.render('Main Menu', font_color)
 ButtonBG = pygame.image.load('Assets/ButtonBG.png')
 bwidth = ButtonBG.get_width()
 level_buttons = [
-    Button(150, 100, ButtonBG, 0.5, Level1, 10),
-    Button(320, 100, ButtonBG, 0.5, Level2, 10),
-    Button(150, 200, ButtonBG, 0.5, Level3, 10),
+    Button(170, 120, ButtonBG, 0.5, Level1, 10),
+    Button(320, 120, ButtonBG, 0.5, Level2, 10),
+    Button(170, 200, ButtonBG, 0.5, Level3, 10),
     Button(320, 200, ButtonBG, 0.5, Level4, 10)
 
 
@@ -49,10 +54,11 @@ level_buttons = [
 Level1_btn = Button(WIDTH // 2 - bwidth // 4, HEIGHT // 2, ButtonBG, 0.5, Level1, 10)
 level2_btn = Button(WIDTH // 2 - bwidth // 4, HEIGHT // 2 + 30, ButtonBG, 0.5, Level2, 10)
 main_menu_btn = Button(WIDTH // 2 - bwidth // 4, HEIGHT // 2 + 150, ButtonBG, 0.5, main_menu, 20)
-
+bg_scroll = 0
 
 def Level_Background(win):
     global main_menu, level_buttons, diamond_fx, background
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -70,12 +76,16 @@ def Level_Background(win):
                 if main_menu_btn.rect.collidepoint(event.pos):
                     diamond_fx.play()
                     return 'main_menu'  # 玩家点击了返回主菜单的按钮
-
-        win.blit(background, (0, 0))
-
+        win.fill((0, 0, 0))
+        # win.blit(MOON, (0, 150))
+        # win.blit(background, (0, 0))
+        for x in range(5):
+            win.blit(BG1, ((x * WIDTH) - bg_scroll * 0.6, 0))
+            win.blit(BG2, ((x * WIDTH) - bg_scroll * 0.7, 0))
+            win.blit(BG3, ((x * WIDTH) - bg_scroll * 0.8, 0))
         # 绘制关卡按钮
         for button in level_buttons:
             button.draw(win)
-
+        pygame.draw.rect(win, (255, 255, 255), (0, 0, WIDTH, HEIGHT), 4, border_radius=10)
         main_menu_btn.draw(win)
         pygame.display.flip()
