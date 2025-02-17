@@ -72,7 +72,7 @@ class Player(pygame.sprite.Sprite):
         self.fall_index = 0
         self.defense_index = 0
 
-        self.defense_count = 5  # 防御次数为4次
+        self.defense_count = 5  # 4 times defense
         self.jump_height = 15
         self.speed = 3
         self.vel = self.jump_height
@@ -102,18 +102,14 @@ class Player(pygame.sprite.Sprite):
             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.size, self.size):
                 # above ground
                 if self.rect.y + dy <= tile[1].y:
-                    # if self.vel < 0 or self.vel == self.jump_height:
-                    # dy = tile[1].top - self.rect.bottom - 10
                     self.rect.bottom = tile[1].top + 1
 
                 self.vel = self.jump_height
 
-            # print(self.vel, dy)
 
         # Checking collision with rocks & stones
         for tile in world.rock_list:
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.size, self.size):
-                # left / right collision
                 dx = 0
             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.size, self.size):
                 # below ground
@@ -231,8 +227,6 @@ class Player(pygame.sprite.Sprite):
 
         self.dx, self.dy = self.check_collision(world, self.dx, self.dy)
 
-        # if self.rect.left + self.dx < 0 or self.rect.right + self.dx > WIDTH:
-        #     self.dx = 0
         if self.rect.left + self.dx < 0:
             self.rect.left = 0
         elif self.rect.right + self.dx > WIDTH:

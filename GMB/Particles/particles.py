@@ -22,7 +22,7 @@ class Trail(pygame.sprite.Sprite):
         self.life = 1.0  # The trail will last until this reaches 0
         self.image = pygame.Surface((self.size * 2, self.size * 2), pygame.SRCALPHA)
         self.rect = self.image.get_rect(center=self.position)
-        # self.rect = pygame.draw.circle(self.win, self.color, (self.x, self.y), self.size)
+
 
     def update(self):
         self.position += self.velocity
@@ -52,18 +52,23 @@ class Trail(pygame.sprite.Sprite):
 
 
 class Explosion(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, x,y,pos,win):
         super(Explosion, self).__init__()
+        self.win = win
+        self.pos = pos
         self.position = Vector2(pos)
         self.velocity = Vector2(random.uniform(-4, 4), random.uniform(-4, 4))
-
+        self.x = x
+        self.y = y
         self.size = random.randint(4, 9)
         self.life = 40  # Duration of the explosion
         self.lifetime = 0  # Current age of the explosion
 
+        self.x_vel = random.randrange(-4, 4)
+        self.y_vel = random.randrange(-4, 4)
+
         self.image = pygame.Surface((self.size * 2, self.size * 2), pygame.SRCALPHA)
         self.rect = self.image.get_rect(center=self.position)
-
         self.color = (150, 150, 150, 255)  # Explosion color with full alpha
 
     def update(self, screen_scroll):
@@ -77,7 +82,7 @@ class Explosion(pygame.sprite.Sprite):
 
         # Fade out the explosion
         alpha = max(0, 255 * (1 - self.lifetime / self.life))
-        self.color = (self.color[0], self.color[1], self.color[2], int(alpha))
+        self.color = (self.color[0], self.color[1], self.color[2],int(alpha))
 
         # Update the size
         self.size = max(0, self.size - 0.2)
@@ -88,5 +93,12 @@ class Explosion(pygame.sprite.Sprite):
         self.image.fill((0, 0, 0, 0))  # Clear the image
         pygame.draw.rect(self.image, self.color, self.image.get_rect())  # Redraw the explosion
 
+        if self.lifetime <= self.life:
+            self.x += self.x_vel + screen_scroll
+            self.y += self.y_vel
+            s = int(self.size)
+            pygame.draw.rect(self.win,self.color,(self.x,self.y, s, s))
+        else:
+            self.kill()
     def draw(self, surface):
         surface.blit(self.image, self.rect)

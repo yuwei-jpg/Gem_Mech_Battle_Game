@@ -1,12 +1,12 @@
 import pygame
 
-from SpiritStalkers.Level.level import Level_Background, screen
-from SpiritStalkers.World.world import World, load_level
-from player import Player
-from SpiritStalkers.Particles.particles import Trail
+from GMB.Level.level import Level_Background, screen
+from GMB.Particles.particles import Trail
+from GMB.World.world import load_level, World
 from projectiles import Bullet, Grenade
-from SpiritStalkers.Button.button import Button
-from SpiritStalkers.Text.texts import Text, Message, MessageBox
+from GMB.Button.button import Button
+from GMB.Text.texts import Text, Message, MessageBox
+from GMB.player import Player
 
 pygame.init()
 
@@ -30,7 +30,7 @@ title_font = "Fonts/Aladin-Regular.ttf"
 instructions_font = 'Fonts/BubblegumSans-Regular.ttf'
 about_intro_font = 'Fonts/DalelandsUncialBold-82zA.ttf'
 about_intro_font2 = 'Fonts/times new roman bold.ttf'
-ghostbusters = Message(WIDTH // 2 + 50, HEIGHT // 2 - 90, 90, "Spirit Stalkers", title_font, (255, 255, 255), win)
+GMB = Message(WIDTH // 2 + 5, HEIGHT // 2 - 90, 90, "Gem Mech Battle", title_font, (255, 255, 255), win)
 left_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 125, 20, "Press A key to go left", instructions_font,
                    (255, 255, 255), win)
 right_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 100, 20, "Press D key to go right", instructions_font,
@@ -45,8 +45,6 @@ w_key = Message(WIDTH // 2 + 10, HEIGHT // 2 - 0, 20, "Press S key to defend (4 
                 (255, 255, 255), win)
 game_won_msg = Message(WIDTH // 2 + 10, HEIGHT // 2 - 5, 20, "You have won the game", instructions_font,
                        (255, 255, 255), win)
-# intro_msg=Message(WIDTH // 2 + 10, HEIGHT // 2 - 5, 20, "CS3305_Group13_pyGame Introduction", about_intro_font2,
-#                        (0, 0, 0), win)
 t = Text(instructions_font, 18)
 font_color = (12, 12, 12)
 play = t.render('Play', font_color)
@@ -57,7 +55,7 @@ exit = t.render('Exit', font_color)
 main_menu = t.render('Main Menu', font_color)
 
 about_font = pygame.font.SysFont('Times New Roman', 20)
-counter_font = pygame.font.Font(None, 25)  # 创建字体对象，None为使用默认字体，36为字体大小
+counter_font = pygame.font.Font(None, 25)
 
 with open('Data/about.txt') as f:
     info = f.read().replace('\n', ' ')
@@ -112,16 +110,17 @@ p_image = pygame.transform.scale(pygame.image.load('Assets/Player2/Player2Idle1.
 p_rect = p_image.get_rect(center=(470, 200))
 p_dy = 1
 p_ctr = 1
+
 # CALCULATE THE COLLECTED_DIAMONDS *********************************************
-# world1=World(objects_group)
 collected_diamonds = 0
 total_diamonds = 0
+
 # LEVEL VARIABLES **************************************************************
 
 ROWS = 24
 COLS = 40
 SCROLL_THRES = 200
-MAX_LEVEL = 1
+MAX_LEVEL = 4
 
 level = 1
 level_length = 0
@@ -161,6 +160,11 @@ def reset_player():
     return p, moving_left, moving_right
 
 
+# WINNING PAGE *******************************************************************
+alpha = 0
+message_display_time = 5000
+start_display_time = None
+
 # MAIN GAME *******************************************************************
 
 main_menu = True
@@ -172,12 +176,6 @@ game_start = False
 game_start2 = False
 game_won = True
 running = True
-
-# 游戏胜利消息的透明度
-alpha = 0
-# 游戏胜利消息显示时间（毫秒）
-message_display_time = 5000  # 5秒
-start_display_time = None  # 开始显示消息的时间
 
 while running:
     win.fill((0, 0, 0))
@@ -205,7 +203,6 @@ while running:
                     jump_fx.play()
             if event.key == pygame.K_s:
                 p.defense = True
-
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE or \
@@ -246,18 +243,11 @@ while running:
                 moving_left = False
             if event.key == pygame.K_d:
                 moving_right = False
-            if event.key == pygame.K_s:  # 释放S键
+            if event.key == pygame.K_s:
                 p.defense = False
     if main_menu:
-        ghostbusters.update()
+        GMB.update()
         trail_group.update()
-        # win.blit(p_image, p_rect)
-        # p_rect.y += p_dy
-        # p_ctr += p_dy
-        # if p_ctr > 15 or p_ctr < -15:
-        #     p_dy *= -1
-        # t = Trail(p_rect.center, (220, 220, 220), win)
-        # trail_group.add(t)
 
         if play_btn.draw(win):
             menu_click_fx.play()
@@ -288,51 +278,45 @@ while running:
             running = False
 
     elif about_page:
-        MessageBox(win, about_font, 'Spirit Stalkers', info)
-        # intro_msg.update()
+        MessageBox(win, about_font, 'Introduction ', info)
         if main_menu_btn.draw(win):
             menu_click_fx.play()
             about_page = False
             main_menu = True
     elif level_page:
-        selected_level = Level_Background(win)  # 调用 Level_Background 并获取返回值
+        selected_level = Level_Background(win)
         if selected_level == 'main_menu':
-            # 如果返回值指示返回主菜单
             level_page = False
             main_menu = True
         elif selected_level == 1:
-            # 如果返回了具体的关卡编号
             level_page = False
             main_menu = False
             game_won = False
-            game_start = True  # 开始游戏
+            game_start = True
             world_data, level_length, w = reset_level(level)
             p, moving_left, moving_right = reset_player()
 
         elif selected_level == 2:
-            # 如果返回了具体的关卡编号
             level_page = False
             main_menu = False
             game_won = False
-            game_start = True  # 开始游戏
+            game_start = True
             world_data, level_length, w = reset_level(2)
             p, moving_left, moving_right = reset_player()
 
         elif selected_level == 3:
-            # 如果返回了具体的关卡编号
             level_page = False
             main_menu = False
             game_won = False
-            game_start = True  # 开始游戏
+            game_start = True
             world_data, level_length, w = reset_level(3)
             p, moving_left, moving_right = reset_player()
 
         elif selected_level == 4:
-            # 如果返回了具体的关卡编号
             level_page = False
             main_menu = False
             game_won = False
-            game_start = True  # 开始游戏
+            game_start = True
             world_data, level_length, w = reset_level(4)
             p, moving_left, moving_right = reset_player()
 
@@ -358,46 +342,40 @@ while running:
         if start_display_time is None:
             start_display_time = pygame.time.get_ticks()
         message = (f"You have got {total_diamonds} gems, you can take these gems with you! Thank you for playing the "
-                   f"SPIRIT STALKERS")
+                   f"GEM MECH BATTLE")
 
-        # 计算消息透明度
+        # Drawing Winning Screen ********************************************************
+        # Calculating The Transparency Of Message
         time_passed = pygame.time.get_ticks() - start_display_time
-        alpha = min(255, time_passed // 20)  # 逐渐增加透明度，直到255
+        alpha = min(255, time_passed // 20)  # Gradually Increase Transparency Until 255
+        win.fill((0, 0, 0))
 
-        win.fill((0, 0, 0))  # 用黑色填充屏幕
-        # 渲染游戏胜利的消息
         font = pygame.font.Font(None, 40)
-        lines = message.split(" ")  # 先按空格分割
+        lines = message.split(" ")  # Split By Space First
         wrapped_lines = []
         line = ""
         for word in lines:
             test_line = f"{line} {word}".strip()
-            # 测试这行文本加上新词后的宽度
+            # Test The Width Of This Line Of Text After Adding New Words
             width, height = font.size(test_line)
-            if width <= WIDTH - 20:  # 20为边缘留白
+            if width <= WIDTH - 20:
                 line = test_line
             else:
-                wrapped_lines.append(line)  # 保存当前行，开始新的一行
+                wrapped_lines.append(line)  # Save Current Line
                 line = word
-        wrapped_lines.append(line)  # 添加最后一行
+        wrapped_lines.append(line)  # Append Last Line
         line_spaceing = 10
         total_height = len(wrapped_lines) * height
         start_y = (HEIGHT - total_height) // 2
         for i, line in enumerate(wrapped_lines):
             text_surface = font.render(line, True, (255, 255, 255))
-            text_surface.set_alpha(alpha)  # 设置文本透明度
+            text_surface.set_alpha(alpha)  # Set Transparency for text
             text_rect = text_surface.get_rect(center=(WIDTH // 2, start_y + i * (height + line_spaceing)))
             win.blit(text_surface, text_rect)
 
-        # 当消息完全显示一段时间后，自动返回主菜单
-        if time_passed > message_display_time + 2000:  # 给消息完全显示后再等2秒
-            # win.blit(MOON, (-40, -10))
-            # game_won = False
-            # main_menu = True
-
-            # game_won_msg.update()
+        # Return To The Main Page
+        if time_passed > message_display_time + 2000:
             if main_menu_btn.draw(win):
-                # win.blit(MOON, (-40, 150))
                 menu_click_fx.play()
                 controls_page = False
                 main_menu = True
@@ -407,10 +385,10 @@ while running:
     elif game_start:
         win.blit(MOON, (-40, -10))
         w.draw_world(win, screen_scroll)
-        # print(world1.get_total_diamonds())
+        # Calculating Diamonds ********************************************************
         diamonds_text = counter_font.render(f"Diamonds: {collected_diamonds}/{w.get_total_diamonds()}", True,
                                             (255, 255, 255))
-        screen.blit(diamonds_text, (WIDTH - diamonds_text.get_width() - 10, 10))  # 在屏幕右上角绘制
+        screen.blit(diamonds_text, (WIDTH - diamonds_text.get_width() - 10, 10))
         # Updating Objects ********************************************************
 
         bullet_group.update(screen_scroll, w)
@@ -430,10 +408,10 @@ while running:
         enemy_group.draw(win)
 
         if p.jump:
-            t = Trail(p.rect.center, (220, 220, 220),win)
+            t = Trail(p.rect.center, (220, 220, 220), win)
             trail_group.add(t)
         if p.jump2:
-            t2 = Trail(p.rect.center, (220, 220, 220),win)
+            t2 = Trail(p.rect.center, (220, 220, 220), win)
             trail_group.add(t2)
 
         screen_scroll = 0
@@ -541,135 +519,8 @@ while running:
             controls_page = False
             game_start = False
 
-    # elif game_start2:
-    #     win.blit(MOON, (-40, -10))
-    #     w.draw_world(win, screen_scroll)
-    #     # print(world1.get_total_diamonds())
-    #     diamonds_text = counter_font.render(f"Diamonds: {collected_diamonds}/{w.get_total_diamonds()}", True,
-    #                                         (255, 255, 255))
-    #     screen.blit(diamonds_text, (WIDTH - diamonds_text.get_width() - 10, 10))  # 在屏幕右上角绘制
-    #     # Updating Objects ********************************************************
-    #
-    #     bullet_group.update(screen_scroll, w)
-    #     grenade_group.update(screen_scroll, p, enemy_group, explosion_group, w)
-    #     explosion_group.update(screen_scroll)
-    #     trail_group.update()
-    #     water_group.update(screen_scroll)
-    #     water_group.draw(win)
-    #     diamond_group.update(screen_scroll)
-    #     diamond_group.draw(win)
-    #     potion_group.update(screen_scroll)
-    #     potion_group.draw(win)
-    #     exit_group.update(screen_scroll)
-    #     exit_group.draw(win)
-    #
-    #     enemy_group.update(screen_scroll, bullet_group, p)
-    #     enemy_group.draw(win)
-    #
-    #     if p.jump:
-    #         t = Trail(p.rect.center, (220, 220, 220), win)
-    #         trail_group.add(t)
-    #     if p.jump2:
-    #         t2 = Trail(p.rect.center, (220, 220, 220), win)
-    #         trail_group.add(t2)
-    #
-    #     screen_scroll = 0
-    #     p.update(moving_left, moving_right, w)
-    #     p.draw(win)
-    #
-    #     if (p.rect.right >= WIDTH - SCROLL_THRES and bg_scroll < (level_length * TILE_SIZE) - WIDTH) \
-    #             or (p.rect.left <= SCROLL_THRES and bg_scroll > abs(dx)):
-    #         dx = p.dx
-    #         p.rect.x -= dx
-    #         screen_scroll = -dx
-    #         bg_scroll -= screen_scroll
-    #
-    #     # Collision Detetction ****************************************************
-    #
-    #     if p.rect.bottom > HEIGHT:
-    #         p.health = 0
-    #
-    #     if pygame.sprite.spritecollide(p, water_group, False):
-    #         p.health = 0
-    #         level = 1
-    #
-    #     if pygame.sprite.spritecollide(p, diamond_group, True):
-    #         diamond_fx.play()
-    #         collected_diamonds += 1
-    #         pass
-    #
-    #     if pygame.sprite.spritecollide(p, exit_group, False):
-    #         if collected_diamonds == w.get_total_diamonds() or collected_diamonds > w.get_total_diamonds():
-    #             total_diamonds += collected_diamonds
-    #             collected_diamonds = 0
-    #             next_level_fx.play()
-    #             level += 1
-    #
-    #         else:
-    #             print("You haven't collected enough diamonds!")
-    #
-    #         if level <= MAX_LEVEL:
-    #             health = p.health
-    #
-    #             world_data, level_length, w = reset_level(level)
-    #             p, moving_left, moving_right = reset_player()
-    #
-    #             p.health = health
-    #
-    #             screen_scroll = 0
-    #             bg_scroll = 0
-    #         else:
-    #
-    #             game_won = True
-    #
-    #     potion = pygame.sprite.spritecollide(p, potion_group, False)
-    #     if potion:
-    #         if p.health < 100:
-    #             potion[0].kill()
-    #             p.health += 15
-    #             health_fx.play()
-    #             if p.health > 100:
-    #                 p.health = 100
-    #
-    #     for bullet in bullet_group:
-    #         enemy = pygame.sprite.spritecollide(bullet, enemy_group, False)
-    #         if enemy and bullet.type == 1:
-    #             if not enemy[0].hit:
-    #                 enemy[0].hit = True
-    #                 enemy[0].health -= 50
-    #             bullet.kill()
-    #         if bullet.rect.colliderect(p):
-    #             if bullet.type == 2:
-    #                 if not p.hit:
-    #                     p.hit = True
-    #                     p.health -= 20
-    #                     print(p.health)
-    #                 bullet.kill()
-    #
-    #     # drawing variables *******************************************************
-    #     if p.alive:
-    #         color = (0, 255, 0)
-    #         if p.health <= 40:
-    #             color = (255, 0, 0)
-    #         pygame.draw.rect(win, color, (6, 8, p.health, 20), border_radius=10)
-    #     pygame.draw.rect(win, (255, 255, 255), (6, 8, 100, 20), 2, border_radius=10)
-    #
-    #     for i in range(p.grenades):
-    #         pygame.draw.circle(win, (200, 200, 200), (20 + 15 * i, 40), 5)
-    #         pygame.draw.circle(win, (255, 50, 50), (20 + 15 * i, 40), 4)
-    #         pygame.draw.circle(win, (0, 0, 0), (20 + 15 * i, 40), 1)
-    #
-    #     if p.health <= 0:
-    #         world_data, level_length, w = reset_level(level)
-    #         p, moving_left, moving_right = reset_player()
-    #
-    #         screen_scroll = 0
-    #         bg_scroll = 0
-    #
-    #         main_menu = True
-    #         about_page = False
-    #         controls_page = False
-    #         game_start2 = False
+
+
 
     pygame.draw.rect(win, (255, 255, 255), (0, 0, WIDTH, HEIGHT), 4, border_radius=10)
     clock.tick(FPS)

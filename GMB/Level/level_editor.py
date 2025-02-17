@@ -1,7 +1,7 @@
 import os
 import pygame
 import pickle
-from SpiritStalkers.Button import button
+from GMB.Button import button
 
 pygame.init()
 
@@ -48,20 +48,20 @@ for row in range(ROWS):
     world_data.append(col)
 
 # load images
-sky = pygame.transform.scale(pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Assets/BG5.png'), (SCREEN_WIDTH, SCREEN_HEIGHT))
-mountain = pygame.transform.scale(pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Assets/BG2.png'), (SCREEN_WIDTH, SCREEN_HEIGHT))
-ground = pygame.transform.scale(pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Assets/BG3.png'), (SCREEN_WIDTH, SCREEN_HEIGHT))
+mountain = pygame.transform.scale(pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/GMB/Assets/BG2.png'), (SCREEN_WIDTH, SCREEN_HEIGHT))
+ground = pygame.transform.scale(pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/GMB/Assets/BG3.png'), (SCREEN_WIDTH, SCREEN_HEIGHT))
+sky = pygame.transform.scale(pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/GMB/Assets/BG5.png'), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-save_img = pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Assets/save_btn.png')
-load_img = pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Assets/load_btn.png')
-left_img = pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Assets/left.png')
-right_img = pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Assets/right.png')
+save_img = pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/GMB/Assets/save_btn.png')
+load_img = pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/GMB/Assets/load_btn.png')
+left_img = pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/GMB/Assets/left.png')
+right_img = pygame.image.load('/Users/jiyuwei/PycharmProjects/py_Game/GMB/Assets/right.png')
 
 # load tileset
 
 img_list = []
 for i in range(1, NUM_TILES + 1):
-    img = pygame.image.load(f'/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Tiles/{i}.png')
+    img = pygame.image.load(f'/Users/jiyuwei/PycharmProjects/py_Game/GMB/Tiles/{i}.png')
     img_list.append(img)
 
 
@@ -173,19 +173,19 @@ while running:
 
     if save_button.draw(win):
         # save level data
-        if os.path.exists(f'/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Level_Data/level{current_level}_data'):
-            with open(f'/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Level_Data/level{current_level}_data', 'rb') as pickle_in:
+        if os.path.exists(f'/Users/jiyuwei/PycharmProjects/py_Game/GMB/Level_Data/level{current_level}_data'):
+            with open(f'/Users/jiyuwei/PycharmProjects/py_Game/GMB/Level_Data/level{current_level}_data', 'rb') as pickle_in:
                 data = pickle.load(pickle_in)
-            with open(f'/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Level_Data/level{current_level}_backup_data', 'wb') as pickle_out:
+            with open(f'/Users/jiyuwei/PycharmProjects/py_Game/GMB/Level_Data/level{current_level}_backup_data', 'wb') as pickle_out:
                 pickle.dump(data, pickle_out)
 
-        pickle_out = open(f'/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Level_Data/level{current_level}_data', 'wb')
+        pickle_out = open(f'/Users/jiyuwei/PycharmProjects/py_Game/GMB/Level_Data/level{current_level}_data', 'wb')
         pickle.dump(world_data, pickle_out)
         pickle_out.close()
     if load_button.draw(win):
         # load in level data
-        if os.path.exists(f'/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Level_Data/level{current_level}_data'):
-            pickle_in = open(f'/Users/jiyuwei/PycharmProjects/py_Game/SpiritStalkers/Level_Data/level{current_level}_data', 'rb')
+        if os.path.exists(f'/Users/jiyuwei/PycharmProjects/py_Game/GMB/Level_Data/level{current_level}_data'):
+            pickle_in = open(f'/Users/jiyuwei/PycharmProjects/py_Game/GMB/Level_Data/level{current_level}_data', 'rb')
             data = pickle.load(pickle_in)
             for i in range(len(data)):
                 for j in range(len(data[0])):

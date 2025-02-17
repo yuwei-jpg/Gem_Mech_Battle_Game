@@ -1,6 +1,6 @@
 import math
 import pygame
-from SpiritStalkers.Particles.particles import Explosion
+from GMB.Particles.particles import Explosion
 
 WIDTH, HEIGHT = 640, 384
 
@@ -109,7 +109,7 @@ class Grenade(pygame.sprite.Sprite):
             if self.timer <= 0:
                 grenade_blast_fx.play()
                 for _ in range(30):
-                    explosion = Explosion(self.rect.center)
+                    explosion = Explosion(self.rect.centerx,self.rect.centery,self.rect.center,self.win)
                     # explosion = Explosion(self.x, self.y, self.win)
                     explosion_group.add(explosion)
 
@@ -136,7 +136,7 @@ class Grenade(pygame.sprite.Sprite):
         grenade_blast_fx.play()
 
         # Create an explosion
-        explosion = Explosion(self.rect.center)
+        explosion = Explosion(self.rect.centerx,self.rect.centery,self.rect.center,self.win)
 
         explosion_group.add(explosion)
 

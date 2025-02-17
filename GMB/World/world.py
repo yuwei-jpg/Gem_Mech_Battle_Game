@@ -1,15 +1,16 @@
 import pickle
 import pygame
 
-from SpiritStalkers.enemies import Ghost
+from GMB.enemies import Robot
 
 NUM_TILES = 60
 TILE_SIZE = 16
 
 img_list = []
-for index in range(1, NUM_TILES+1):
+for index in range(1, NUM_TILES + 1):
     img = pygame.image.load(f'Tiles/{index}.png')
     img_list.append(img)
+
 
 class World:
     def __init__(self, objects_group):
@@ -18,12 +19,13 @@ class World:
         self.ground_list = []
         self.rock_list = []
         self.decor_list = []
-        self.total_diamonds_count=0
+        self.total_diamonds_count = 0
+
     def generate_world(self, data, win):
         for y, row in enumerate(data):
             for x, tile in enumerate(row):
                 if tile >= 0:
-                    img = img_list[tile-1]
+                    img = img_list[tile - 1]
                     rect = img.get_rect()
                     rect.x = x * TILE_SIZE
                     rect.y = y * TILE_SIZE
@@ -39,27 +41,27 @@ class World:
                         self.decor_list.append(tile_data)
 
                     if tile == 12:
-                        exit = Exit(x*TILE_SIZE, y*TILE_SIZE, tile_data)
+                        exit = Exit(x * TILE_SIZE, y * TILE_SIZE, tile_data)
                         self.objects_group[4].add(exit)
 
                     if tile == 41:
-                        water = Water(x*TILE_SIZE, y*TILE_SIZE, tile_data)
+                        water = Water(x * TILE_SIZE, y * TILE_SIZE, tile_data)
                         self.objects_group[0].add(water)
 
                     if tile in (52, 53, 56, 57):
-                        diamond = Diamond(x*TILE_SIZE, y*TILE_SIZE, tile_data)
+                        diamond = Diamond(x * TILE_SIZE, y * TILE_SIZE, tile_data)
                         self.objects_group[1].add(diamond)
                         self.total_diamonds_count += 1
 
                     if tile in (54, 55, 58, 59):
-                        potion = Potion(x*TILE_SIZE, y*TILE_SIZE, tile_data)
+                        potion = Potion(x * TILE_SIZE, y * TILE_SIZE, tile_data)
                         self.objects_group[2].add(potion)
 
                     if tile == 60:
-                        enemy = Ghost(x*TILE_SIZE, y*TILE_SIZE, win)
+                        enemy = Robot(x * TILE_SIZE, y * TILE_SIZE, win)
                         self.objects_group[3].add(enemy)
 
-    def get_total_diamonds(self):  # 新方法返回宝石总数
+    def get_total_diamonds(self):
         return self.total_diamonds_count
 
     def draw_world(self, win, screen_scroll):
@@ -73,21 +75,6 @@ class World:
             tile[1][0] += screen_scroll
             win.blit(tile[0], tile[1])
 
-
-class Ladder(pygame.sprite.Sprite):
-    def __init__(self, x, y, tile_data):
-        super(Ladder, self).__init__()
-
-        self.image = tile_data[0]
-        self.rect = tile_data[1]
-        self.rect.x = x
-        self.rect.y = y
-
-    def update(self, screen_scroll):
-        self.rect.x += screen_scroll
-
-    def draw(self, win):
-        win.blit(self.image, self.rect)
 
 class Water(pygame.sprite.Sprite):
     def __init__(self, x, y, tile_data):
@@ -103,6 +90,7 @@ class Water(pygame.sprite.Sprite):
 
     def draw(self, win):
         win.blit(self.image, self.rect)
+
 
 class Diamond(pygame.sprite.Sprite):
     def __init__(self, x, y, tile_data):
@@ -135,11 +123,12 @@ class Potion(pygame.sprite.Sprite):
     def draw(self, win):
         win.blit(self.image, self.rect)
 
+
 class Exit(pygame.sprite.Sprite):
     def __init__(self, x, y, tile_data):
         super(Exit, self).__init__()
 
-        self.image = pygame.transform.scale(tile_data[0], (24,24))
+        self.image = pygame.transform.scale(tile_data[0], (24, 24))
         self.rect = tile_data[1]
         self.rect.x = x
         self.rect.y = y - 8
@@ -150,6 +139,7 @@ class Exit(pygame.sprite.Sprite):
     def draw(self, win):
         win.blit(self.image, self.rect)
 
+
 def load_level(level):
     file = f'Level_Data/level{level}_data'
     with open(file, 'rb') as f:
@@ -159,5 +149,3 @@ def load_level(level):
                 if data[y][x] >= 0:
                     data[y][x] += 1
     return data, len(data[0])
-
-

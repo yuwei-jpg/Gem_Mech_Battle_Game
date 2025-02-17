@@ -3,7 +3,6 @@ import pygame
 WIDTH, HEIGHT = 640, 384
 
 class Text:
-	''' This class returns an image '''
 	def __init__(self, font, font_size):
 		self.font = pygame.font.Font(font, font_size)
 
@@ -12,7 +11,6 @@ class Text:
 		return image
 
 class Message:
-	''' This class blits an image at given position '''
 	def __init__(self, x, y, size, text, font, color, win):
 		self.win = win
 		self.color = color
@@ -45,7 +43,6 @@ class Message:
 		self.win.blit(self.image, self.rect)
 
 class BlinkingText(Message):
-	''' This class creates a blinking text image surface '''
 	def __init__(self, x, y, size, text, font, color, win):
 		super(BlinkingText, self).__init__(x, y, size, text, font, color, win)
 		self.index = 0
@@ -60,7 +57,7 @@ class BlinkingText(Message):
 			self.win.blit(self.image, self.rect)
 
 def MessageBox(win, font, name, text):
-	''' This class creates a message box and automatically fills the text '''
+
 	WIDTH = 640
 	HEIGHT = 284
 	x = 35
