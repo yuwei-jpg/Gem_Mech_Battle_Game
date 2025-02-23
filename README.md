@@ -5,7 +5,7 @@ The Gem Mech Battle presents a vibrant 2D side-scrolling adventure where a sprit
 ## Goal
 Your ultimate goal is to get all the gems, use your weapon to attack robots, avoid robot attacks, and reach the end of the game.
 
-![images](https://github.com/yuwei-jpg/Gem_Mech_Battle_Game/blob/main/game.png)
+
 ## Controls
 * A ← Left
 * D → Right
@@ -15,5 +15,4 @@ Your ultimate goal is to get all the gems, use your weapon to attack robots, avo
 * Space Shoot
 * Q Quit
 ## Characters 
-![images](https://github.com/yuwei-jpg/Gem_Mech_Battle_Game/blob/main/elf.png)
-![images](https://github.com/yuwei-jpg/Gem_Mech_Battle_Game/blob/main/robot.png)
+
