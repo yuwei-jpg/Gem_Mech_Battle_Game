@@ -79,7 +79,7 @@ This project is open-source and licensed under the [MIT License](LICENSE).
 ---
 
 ## 🤝 Contributing
-We welcome contributions to **Gem Mech Battle**! If you'd like to improve the game, follow these steps:
+Welcome **YOUR** contributions to **Gem Mech Battle**! If you'd like to improve the game, follow these steps:
 
 1. **Fork the repository.**
 2. **Create a new branch** (`git checkout -b feature-branch`).
