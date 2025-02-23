@@ -50,17 +50,48 @@ These mechanical foes will stop at nothing to prevent you from achieving your go
 
 ---
 
-## 🔧 Installation & How to Play
-
-### **🛠 System Requirements**
-- **OS:** Windows / macOS / Linux
-- **Processor:** Dual-Core CPU
-- **RAM:** 4GB or more recommended
-- **Graphics:** Integrated or dedicated GPU
-- **Storage:** At least 200MB of free space
+## 🔧 Installation
 
 ### **📥 Installation Steps**
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/yuwei-jpg/Gem_Mech_Battle_Game.git
+2. **Navigate to the game directory:**
+   ```bash
+   cd Gem_Mech_Battle_Game
+3. **Run the game:**
+   ```bash
+   python main.py
+---
 
+## 📌 Future Enhancements
+- 🔹 **New enemy types** with different attack behaviors.
+- 🔹 **Power-ups & weapon upgrades** to enhance combat strategy.
+- 🔹 **Multiplayer mode** for co-op gameplay.
+- 🔹 **Improved level design** with more challenging obstacles.
+- 🔹 **Custom character skins & unlockable items**.
+
+---
+
+## 📜 License
+This project is open-source and licensed under the [MIT License](LICENSE).
+
+---
+
+## 🤝 Contributing
+We welcome contributions to **Gem Mech Battle**! If you'd like to improve the game, follow these steps:
+
+1. **Fork the repository.**
+2. **Create a new branch** (`git checkout -b feature-branch`).
+3. **Commit your changes** (`git commit -m "Add new feature"`).
+4. **Push the branch** (`git push origin feature-branch`).
+5. **Open a Pull Request!**
+
+---
+
+## 📬 Contact
+📧 **Developer:** Yuwei  
+🔗 **GitHub:** [yuwei-jpg](https://github.com/yuwei-jpg)  
+💬 **Issues & Suggestions:** Open an issue in the repository  
+
+I hope you enjoy playing **Gem Mech Battle**! 🎮🔥
